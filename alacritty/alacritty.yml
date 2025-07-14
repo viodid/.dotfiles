@@ -1,0 +1,124 @@
+# Window config
+window:
+  #dimensions:
+    #columns: 82
+    #lines: 24
+  opacity: 1
+  padding:
+    x: 4
+    y: 2
+  dynamic_padding: true
+  decorations: full
+  startup_mode: Fullscreen
+
+scrolling:
+  # Maximum number of lines in the scrollback buffer.
+  # Specifying '0' will disable scrolling.
+  history: 10000
+  # Number of lines the viewport will move for every line scrolled when
+  # scrollback is enabled (history > 0).
+  multiplier: 3
+
+# Fon config
+# font:
+#   normal:
+#     family: MesloLGS NF
+#     style: Regular
+#   bold:
+#     family: MesloLGS NF
+#     style: Bold
+#   italic:
+#     family: MesloLGS NF
+#     style: Italic
+#   bold_italic:
+#     family: MesloLGS NF
+#     style: Bold Italic
+#   size: 15.0
+
+# https://github.com/catppuccin/alacritty/blob/main/catppuccin-frappe.toml
+colors:
+  primary:
+    background: '#303446'
+    foreground: '#C6D0F5'
+    dim_foreground: '#C6D0F5'
+    bright_foreground: '#C6D0F5'
+  cursor:
+    text: '#303446'
+    cursor: '#F2D5CF'
+  vi_mode_cursor:
+    text: '#303446'
+    cursor: '#BABBF1'
+  search:
+    matches:
+      foreground: '#303446'
+      background: '#A5ADCE'
+    focused_match:
+      foreground: '#303446'
+      background: '#A6D189'
+  footer_bar:
+    foreground: '#303446'
+    background: '#A5ADCE'
+  hints:
+    start:
+      foreground: '#303446'
+      background: '#E5C890'
+    end:
+      foreground: '#303446'
+      background: '#A5ADCE'
+  selection:
+    text: '#303446'
+    background: '#F2D5CF'
+  normal:
+    black: '#51576D'
+    red: '#E78284'
+    green: '#A6D189'
+    yellow: '#E5C890'
+    blue: '#8CAAEE'
+    magenta: '#F4B8E4'
+    cyan: '#81C8BE'
+    white: '#B5BFE2'
+  bright:
+    black: '#626880'
+    red: '#E78284'
+    green: '#A6D189'
+    yellow: '#E5C890'
+    blue: '#8CAAEE'
+    magenta: '#F4B8E4'
+    cyan: '#81C8BE'
+    white: '#A5ADCE'
+  dim:
+    black: '#51576D'
+    red: '#E78284'
+    green: '#A6D189'
+    yellow: '#E5C890'
+    blue: '#8CAAEE'
+    magenta: '#F4B8E4'
+    cyan: '#81C8BE'
+    white: '#B5BFE2'
+  indexed_colors:
+    - index: 16
+      color: '#EF9F76'
+    - index: 17
+      color: '#F2D5CF'
+
+
+TokyoNightmouse:
+  # If this is `true`, the cursor is temporarily hidden when typing.
+  hide_when_typing: true
+
+mouse:
+  hide_when_typing: true
+
+
+cursor:
+  # Cursor style
+  #
+  # Values for 'style':
+  #   - ▇ Block
+  #   - _ Underline
+  #   - | Beam
+  style: Block
+
+  # If this is `true`, the cursor will be rendered as a hollow box when the
+  # window is not focused.
+  unfocused_hollow: true
