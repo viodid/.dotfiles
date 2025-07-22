@@ -40,3 +40,8 @@ vim.keymap.set("n", "<M-e>", "<cmd>copen<CR>")
 
 -- lsp
 vim.keymap.set("n", "gd", "<C-]>")
+
+-- jump to signature (treesitter-context)
+vim.keymap.set("n", "[c", function()
+  require("treesitter-context").go_to_context(vim.v.count1)
+end, { silent = true })

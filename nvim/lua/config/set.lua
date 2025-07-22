@@ -28,28 +28,34 @@ vim.opt.hlsearch = false
 vim.opt.incsearch = true
 
 vim.opt.termguicolors = true
-
 vim.opt.scrolloff = 8
-
 vim.opt.updatetime = 50
-
 vim.opt.colorcolumn = "80"
+-- vim.opt.LineNr.guifg = "white"
+-- vim.opt.highlight.Normal.guibg = "none"
+vim.cmd [[
+    highlight Normal guibg=none
+    highlight LineNrAbove guifg=grey
+    highlight LineNr guifg=white
+    highlight LineNrBelow guifg=grey
+]]
+
 
 -- Highlight when yanking
 vim.api.nvim_create_autocmd('TextYankPost', {
-    desc = 'Highlight when yanking',
-    group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
-    callback = function()
-        vim.highlight.on_yank()
-    end,
+  desc = 'Highlight when yanking',
+  group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
+  callback = function()
+    vim.highlight.on_yank()
+  end,
 })
 
 
 vim.diagnostic.config({
-    virtual_text = true,
-    signs = true,
-    update_in_insert = false,
-    underline = true,
-    severity_sort = false,
-    float = true,
+  virtual_text = true,
+  signs = true,
+  update_in_insert = false,
+  underline = true,
+  severity_sort = false,
+  float = true,
 })
