@@ -10,10 +10,9 @@ return {
       -- ✅ Set underline highlight for cursorword
       -- vim.api.nvim_set_hl(0, 'MiniCursorword', { underline = true })
       -- vim.api.nvim_set_hl(0, 'MiniCursorwordCurrent', { underline = false }) -- Optional: highlight current word differently
-      vim.api.nvim_set_hl(0, 'MiniCursorword', { bg = "#884499" })
+      vim.api.nvim_set_hl(0, 'MiniCursorword', { bg = "#444499" })
       vim.api.nvim_set_hl(0, 'MiniCursorwordCurrent', { underline = false }) -- Optional: highlight current word differently
 
-      -- TODO:
       local hipatterns = require('mini.hipatterns')
       hipatterns.setup({
         highlighters = {

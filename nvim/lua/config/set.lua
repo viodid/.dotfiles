@@ -24,20 +24,20 @@ vim.opt.backup = false
 vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
 vim.opt.undofile = true
 
-vim.opt.hlsearch = false
+vim.opt.hlsearch = true
 vim.opt.incsearch = true
 
 vim.opt.termguicolors = true
 vim.opt.scrolloff = 8
 vim.opt.updatetime = 50
 vim.opt.colorcolumn = "80"
--- vim.opt.LineNr.guifg = "white"
--- vim.opt.highlight.Normal.guibg = "none"
+
+-- General color styles
+-- highlight Normal guibg=none
 vim.cmd [[
-    highlight Normal guibg=none
-    highlight LineNrAbove guifg=grey
-    highlight LineNr guifg=white
-    highlight LineNrBelow guifg=grey
+  highlight LineNr guifg=white
+  highlight LineNrAbove guifg=grey
+  highlight LineNrBelow guifg=grey
 ]]
 
 
@@ -59,3 +59,7 @@ vim.diagnostic.config({
   severity_sort = false,
   float = true,
 })
+
+-- True Color (24-bit) and italics with alacritty + tmux + vim (neovim)
+vim.o.termguicolors = true
+-- vim.cmd 'colorscheme catppuccin-frappe'
