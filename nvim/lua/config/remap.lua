@@ -45,3 +45,6 @@ vim.keymap.set("n", "gd", "<C-]>")
 vim.keymap.set("n", "[c", function()
   require("treesitter-context").go_to_context(vim.v.count1)
 end, { silent = true })
+
+-- cellular-automation
+vim.keymap.set("n", "<leader>fml", "<cmd>CellularAutomaton make_it_rain<CR>")
