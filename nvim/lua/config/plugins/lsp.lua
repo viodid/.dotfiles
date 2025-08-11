@@ -16,8 +16,12 @@ return {
     },
     enabled = true,
     config = function()
-      require("lspconfig").gopls.setup({})
+      local capabilities = require('blink.cmp').get_lsp_capabilities()
 
+      -- Go
+      require("lspconfig").gopls.setup({ capabilites = capabilities })
+
+      -- C/C++
       require("lspconfig").clangd.setup({
         cmd = { 'clangd', '--background-index', '--clang-tidy', '--log=verbose', '--fallback-style=WebKit' },
         init_options = {
@@ -25,7 +29,8 @@ return {
         },
       })
 
-      require("lspconfig").lua_ls.setup {}
+      -- Lua
+      require("lspconfig").lua_ls.setup({ capabilites = capabilities })
 
       vim.api.nvim_create_autocmd('LspAttach', {
         group = vim.api.nvim_create_augroup('my.lsp', {}),
