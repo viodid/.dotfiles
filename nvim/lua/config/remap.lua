@@ -40,6 +40,7 @@ vim.keymap.set("n", "<M-e>", "<cmd>copen<CR>")
 
 -- lsp
 vim.keymap.set("n", "gd", "<C-]>")
+vim.keymap.set("i", '<C-k>', vim.lsp.buf.signature_help)
 
 -- jump to signature (treesitter-context)
 vim.keymap.set("n", "[c", function()
@@ -48,3 +49,7 @@ end, { silent = true })
 
 -- cellular-automation
 vim.keymap.set("n", "<leader>fml", "<cmd>CellularAutomaton make_it_rain<CR>")
+
+-- diagnostics
+vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
+vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist)

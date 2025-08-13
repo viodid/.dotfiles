@@ -27,6 +27,7 @@ return {
         init_options = {
           -- fallbackFlags = { '-std=c++98' },
         },
+        capabilites = capabilities
       })
 
       -- Lua
