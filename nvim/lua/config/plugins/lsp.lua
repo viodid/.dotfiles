@@ -18,6 +18,9 @@ return {
     config = function()
       local capabilities = require('blink.cmp').get_lsp_capabilities()
 
+      -- Python
+      require("lspconfig").basedpyright.setup({ capabilites = capabilities })
+
       -- Go
       require("lspconfig").gopls.setup({ capabilites = capabilities })
 
