@@ -62,4 +62,3 @@ vim.diagnostic.config({
 
 -- True Color (24-bit) and italics with alacritty + tmux + vim (neovim)
 vim.o.termguicolors = true
--- vim.cmd 'colorscheme catppuccin-frappe'
