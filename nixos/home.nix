@@ -1,32 +1,78 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 let
   mod = "Mod1";
   laptopScreen = "eDP-1";
   externalMonitor = "DP-1";
+
+  # Catppuccin Mocha palette, shared by every program below
+  colors = {
+    base = "1e1e2e";
+    text = "cdd6f4";
+    blue = "89b4fa";
+  };
+
+  wallpaper = ./linux.png;
+
+  # Full paths to binaries (named *Bin so they don't shadow pkgs.* inside `with pkgs`)
+  xrandrBin        = "${pkgs.xorg.xrandr}/bin/xrandr";
+  wpctlBin         = "${pkgs.wireplumber}/bin/wpctl";
+  brightnessctlBin = "${pkgs.brightnessctl}/bin/brightnessctl";
+
+  # Pick a power profile from a rofi menu
+  powerProfileMenu = pkgs.writeShellScript "power-profile-menu" ''
+    current=$(${pkgs.power-profiles-daemon}/bin/powerprofilesctl get)
+    choice=$(printf 'power-saver\nbalanced\nperformance' \
+      | ${pkgs.rofi}/bin/rofi -dmenu -p "power ($current)") || exit 0
+    ${pkgs.power-profiles-daemon}/bin/powerprofilesctl set "$choice"
+  '';
 in {
   home.username = "viodid";
   home.homeDirectory = "/home/viodid";
   home.stateVersion = "26.05";
 
+  programs.home-manager.enable = true;
   fonts.fontconfig.enable = true;
 
+  # ---------------------------------------------------------------------------
+  # Packages
+  # ---------------------------------------------------------------------------
   home.packages = with pkgs; [
     feh
-    i3lock
-    rofi
     brightnessctl
     pavucontrol
     xclip
-    font-awesome
+    gimp
     nerd-fonts.jetbrains-mono
   ];
 
+  programs.firefox.enable = true;
+
+  programs.git = {
+    enable = true;
+    userName = "viodid";
+    userEmail = "you@example.com";   # <- change me
+    extraConfig.init.defaultBranch = "main";
+  };
+
+  programs.rofi = {
+    enable = true;
+    terminal = "${pkgs.alacritty}/bin/alacritty";
+    font = "JetBrainsMono Nerd Font 11";
+  };
+
   services.blueman-applet.enable = true;
 
-  # ----------------------------------------------------------------------------
-  # Alacritty Terminal
-  # ----------------------------------------------------------------------------
+  # Lock on suspend/lid close and after 10 min idle
+  services.screen-locker = {
+    enable = true;
+    lockCmd = "${pkgs.i3lock}/bin/i3lock -c ${colors.base}";
+    inactiveInterval = 10;
+  };
+
+  # ---------------------------------------------------------------------------
+  # Alacritty
+  # ---------------------------------------------------------------------------
   programs.alacritty = {
     enable = true;
     settings = {
@@ -38,18 +84,16 @@ in {
         normal = { family = "JetBrainsMono Nerd Font"; style = "Regular"; };
         size = 11.0;
       };
-      colors = {
-        primary = {
-          background = "0x1e1e2e";
-          foreground = "0xcdd6f4";
-        };
+      colors.primary = {
+        background = "0x${colors.base}";
+        foreground = "0x${colors.text}";
       };
     };
   };
 
-  # ----------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
   # Tmux
-  # ----------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
   programs.tmux = {
     enable = true;
     mouse = true;
@@ -67,9 +111,9 @@ in {
     '';
   };
 
-  # ----------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
   # Picom
-  # ----------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
   services.picom = {
     enable = true;
     backend = "glx";
@@ -77,30 +121,36 @@ in {
     fade = false;
   };
 
-  # ----------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
   # Dunst
-  # ----------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
   services.dunst = {
     enable = true;
-    settings = {
-      global = {
-        font = "JetBrainsMono Nerd Font 10";
-        frame_width = 1;
-        frame_color = "#89b4fa";
-        background = "#1e1e2e";
-        foreground = "#cdd6f4";
-        timeout = 5;
-      };
+    settings.global = {
+      font = "JetBrainsMono Nerd Font 10";
+      frame_width = 1;
+      frame_color = "#${colors.blue}";
+      background = "#${colors.base}";
+      foreground = "#${colors.text}";
+      timeout = 5;
     };
   };
 
-  # ----------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
   # i3status-rust
-  # ----------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
   programs.i3status-rust = {
     enable = true;
     bars.default = {
+      theme = "ctp-mocha";
+      icons = "material-nf";
       blocks = [
+        {
+          block = "custom";
+          command = "${pkgs.curl}/bin/curl -s --max-time 2 ifconfig.me";
+          interval = 60;
+          format = " $text ";
+        }
         {
           block = "disk_space";
           path = "/";
@@ -116,9 +166,7 @@ in {
           block = "cpu";
           interval = 2;
         }
-        {
-          block = "sound";
-        }
+        { block = "sound"; }
         {
           block = "battery";
           interval = 10;
@@ -130,19 +178,17 @@ in {
           format = " $timestamp.datetime(f:'%a %d/%m %R') ";
         }
       ];
-      theme = "gruvbox-dark";
-      icons = "awesome5";
     };
   };
 
-  # ----------------------------------------------------------------------------
-  # i3 Window Manager
-  # ----------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # i3
+  # ---------------------------------------------------------------------------
   xsession.windowManager.i3 = {
     enable = true;
     config = {
       modifier = mod;
-      terminal = "alacritty";
+      terminal = "${pkgs.alacritty}/bin/alacritty";
       menu = "${pkgs.rofi}/bin/rofi -show drun -show-icons";
 
       focus = {
@@ -155,30 +201,24 @@ in {
         outer = 4;
       };
 
-      workspaceOutputAssign = [
-        { workspace = "1"; output = externalMonitor; }
-        { workspace = "2"; output = externalMonitor; }
-        { workspace = "3"; output = externalMonitor; }
-        { workspace = "4"; output = externalMonitor; }
-        { workspace = "5"; output = externalMonitor; }
-        { workspace = "6"; output = externalMonitor; }
-        { workspace = "7"; output = externalMonitor; }
-        { workspace = "8"; output = externalMonitor; }
-        { workspace = "9"; output = externalMonitor; }
-        { workspace = "10"; output = laptopScreen; }
-      ];
+      workspaceOutputAssign =
+        map (n: { workspace = toString n; output = externalMonitor; }) (lib.range 1 9)
+        ++ [ { workspace = "10"; output = laptopScreen; } ];
 
-      keybindings = pkgs.lib.mkOptionDefault {
-        "${mod}+Shift+x" = "exec ${pkgs.i3lock}/bin/i3lock -c 1e1e2e";
+      keybindings = lib.mkOptionDefault {
+        "${mod}+Shift+x" = "exec ${config.services.screen-locker.lockCmd}";
 
-        # Audio
-        "XF86AudioRaiseVolume" = "exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +5%";
-        "XF86AudioLowerVolume" = "exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -5%";
-        "XF86AudioMute" = "exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle";
+        # Power profile picker
+        "${mod}+p" = "exec --no-startup-id ${powerProfileMenu}";
+
+        # Audio (PipeWire/WirePlumber, capped at 100%)
+        "XF86AudioRaiseVolume" = "exec --no-startup-id ${wpctlBin} set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+";
+        "XF86AudioLowerVolume" = "exec --no-startup-id ${wpctlBin} set-volume @DEFAULT_AUDIO_SINK@ 5%-";
+        "XF86AudioMute"        = "exec --no-startup-id ${wpctlBin} set-mute @DEFAULT_AUDIO_SINK@ toggle";
 
         # Brightness
-        "XF86MonBrightnessUp" = "exec --no-startup-id brightnessctl set +10%";
-        "XF86MonBrightnessDown" = "exec --no-startup-id brightnessctl set 10%-";
+        "XF86MonBrightnessUp"   = "exec --no-startup-id ${brightnessctlBin} set +10%";
+        "XF86MonBrightnessDown" = "exec --no-startup-id ${brightnessctlBin} set 10%-";
 
         # Navigation (Vim keys)
         "${mod}+h" = "focus left";
@@ -194,12 +234,17 @@ in {
 
       startup = [
         {
-          command = "xrandr --output ${externalMonitor} --mode 3840x2560 --rate 119.99 --primary --pos 0x0 --output ${laptopScreen} --auto --pos 3840x1480";
+          # Docked layout; falls back to laptop-only if DP-1 is not connected
+          command = lib.concatStringsSep " " [
+            "${xrandrBin} --output ${externalMonitor} --mode 3840x2560 --rate 120 --primary --pos 0x0"
+            "--output ${laptopScreen} --auto --pos 3840x1480"
+            "|| ${xrandrBin} --output ${laptopScreen} --auto --primary"
+          ];
           always = true;
           notification = false;
         }
         {
-          command = "${pkgs.feh}/bin/feh --bg-scale ~/linux.png || true";
+          command = "${pkgs.feh}/bin/feh --bg-scale ${wallpaper}";
           always = true;
           notification = false;
         }
@@ -208,15 +253,13 @@ in {
       bars = [
         {
           position = "bottom";
-          statusCommand = "${pkgs.i3status-rust}/bin/i3status-rs /home/viodid/.config/i3status-rust/config-default.toml";
+          statusCommand = "${pkgs.i3status-rust}/bin/i3status-rs ${config.xdg.configHome}/i3status-rust/config-default.toml";
           fonts = {
-            names = [ "JetBrainsMono Nerd Font" "FontAwesome" ];
+            names = [ "JetBrainsMono Nerd Font" ];
             size = 13.0;
           };
         }
       ];
     };
   };
-
-  programs.home-manager.enable = true;
 }
