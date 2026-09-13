@@ -52,6 +52,17 @@ return {
           row = 0,
           col = 1
         },
+        on_attach = function(bufnr)
+          local gs = require("gitsigns")
+          local map = function(m, k, f, d)
+            vim.keymap.set(m, k, f, { buffer = bufnr, desc = "Git: " .. d })
+          end
+          map("n", "]h", function() gs.nav_hunk("next") end, "Next hunk")
+          map("n", "[h", function() gs.nav_hunk("prev") end, "Prev hunk")
+          map("n", "<leader>hp", gs.preview_hunk, "Preview hunk")
+          map("n", "<leader>hr", gs.reset_hunk, "Reset hunk")
+          map("n", "<leader>hb", function() gs.blame_line({ full = true }) end, "Blame line")
+        end,
       }
     end,
   }

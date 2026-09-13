@@ -1,99 +1,62 @@
--- config/plugins/lsp.lua
 return {
   {
     "neovim/nvim-lspconfig",
+    event = { "BufReadPre", "BufNewFile" },
     dependencies = {
-      {
-        "folke/lazydev.nvim",
-        ft = "lua", -- only load on lua files
-        opts = {
-          library = {
-            { path = "${3rd}/luv/library", words = { "vim%.uv" } },
-          },
-        },
-      },
+      { "folke/lazydev.nvim", ft = "lua", opts = {
+          library = { { path = "${3rd}/luv/library", words = { "vim%.uv" } } },
+      } },
     },
-    enabled = true,
     config = function()
-      local capabilities = require('blink.cmp').get_lsp_capabilities()
+      -- one wildcard config instead of repeating capabilities per server
+      vim.lsp.config("*", { capabilities = require("blink.cmp").get_lsp_capabilities() })
 
-      -- Define configurations for each LSP server
-      vim.lsp.config('basedpyright', { capabilities = capabilities })
-      vim.lsp.config('gopls', { capabilities = capabilities })
-      vim.lsp.config('clangd', {
-        cmd = { 'clangd', '--background-index', '--clang-tidy', '--log=verbose', '--fallback-style=WebKit' },
-        capabilities = capabilities,
+      vim.lsp.config("clangd", {
+        cmd = { "clangd", "--background-index", "--clang-tidy", "--fallback-style=WebKit" },
       })
-      vim.lsp.config('lua_ls', { capabilities = capabilities })
-
-      -- Enable the configured LSP servers
-      vim.lsp.enable({ 'basedpyright', 'gopls', 'clangd', 'lua_ls' })
-
-      -- LspAttach autocommand for keymaps and other buffer-local settings
-      vim.api.nvim_create_autocmd('LspAttach', {
-        group = vim.api.nvim_create_augroup('my.lsp.attach', { clear = true }),
-        callback = function(args)
-          -- Add your LSP keymaps here
+      vim.lsp.config("ruff", {
+        on_attach = function(client)
+          client.server_capabilities.hoverProvider = false -- let basedpyright own hover
         end,
       })
 
-      -- Create a dedicated augroup for format-on-save logic
-      local format_group = vim.api.nvim_create_augroup('FormatOnSave', { clear = true })
+      vim.lsp.enable({ "basedpyright", "gopls", "clangd", "lua_ls", "ruff", "nil_ls" })
 
-      -- Autocommand for Python files using Ruff (synchronous)
-      vim.api.nvim_create_autocmd("BufWritePre", {
-        group = format_group,
-        pattern = "*.py",
+      vim.api.nvim_create_autocmd("LspAttach", {
+        group = vim.api.nvim_create_augroup("my.lsp.attach", { clear = true }),
         callback = function(args)
-          local bufnr = args.buf
-          local filepath = vim.fn.bufname(bufnr)
-          if filepath == '' then return end
-
-          local cursor_pos = vim.api.nvim_win_get_cursor(0)
-          local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-          local content = table.concat(lines, '\n')
-
-          local ruff_result = vim.system({ 'ruff', 'format', '--stdin-filename', filepath }, {
-            text = true,
-            stdin = content,
-            cwd = vim.fn.fnamemodify(filepath, ':h'),
-          }):wait()
-
-          if ruff_result.code == 0 then
-            local formatted_content = ruff_result.stdout or ""
-            local new_lines = vim.split(formatted_content, '\n', { plain = true })
-
-            if #new_lines ~= #lines or table.concat(new_lines, '\n') ~= content then
-              vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, new_lines)
-            end
-          else
-            vim.notify('Ruff formatting failed: ' .. (ruff_result.stderr or "Unknown error"), vim.log.levels.ERROR,
-              { title = 'Ruff Formatter' })
+          local buf = args.buf
+          local map = function(k, f, d)
+            vim.keymap.set("n", k, f, { buffer = buf, desc = "LSP: " .. d })
           end
-
-          vim.api.nvim_win_set_cursor(0, cursor_pos)
+          local tb = require("telescope.builtin")
+          map("gd", vim.lsp.buf.definition, "Definition")
+          map("gD", vim.lsp.buf.declaration, "Declaration")
+          map("gr", tb.lsp_references, "References")
+          map("gI", tb.lsp_implementations, "Implementations")
+          map("<leader>D", vim.lsp.buf.type_definition, "Type definition")
+          map("<leader>rn", vim.lsp.buf.rename, "Rename")
+          map("<leader>ca", vim.lsp.buf.code_action, "Code action")
+          map("<leader>ds", tb.lsp_document_symbols, "Document symbols")
+          map("<leader>sw", tb.lsp_dynamic_workspace_symbols, "Workspace symbols")
         end,
       })
 
-      -- Fallback autocommand for other files using LSP (synchronous)
+      -- format on save: ruff for python, LSP for everything else
       vim.api.nvim_create_autocmd("BufWritePre", {
-        group = format_group,
-        pattern = "*",
+        group = vim.api.nvim_create_augroup("FormatOnSave", { clear = true }),
         callback = function(args)
-          if vim.bo[args.buf].filetype == 'python' then
-            return -- Skip, as it's handled by the Ruff autocommand above
-          end
-
-          -- Save cursor position
-          local cursor_pos = vim.api.nvim_win_get_cursor(0)
-
-          -- FIX: Simplified LSP formatting call.
-          -- This function automatically finds a client that supports formatting
-          -- for the given buffer. It does nothing if no such client is found.
-          vim.lsp.buf.format({ bufnr = args.buf, async = false, timeout_ms = 2000 })
-
-          -- Restore cursor position
-          vim.api.nvim_win_set_cursor(0, cursor_pos)
+          vim.lsp.buf.format({
+            bufnr = args.buf,
+            async = false,
+            timeout_ms = 2000,
+            filter = function(client)
+              if vim.bo[args.buf].filetype == "python" then
+                return client.name == "ruff"
+              end
+              return client.name ~= "ruff"
+            end,
+          })
         end,
       })
     end,
