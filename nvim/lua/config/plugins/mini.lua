@@ -5,7 +5,7 @@ return {
       local statusline = require 'mini.statusline'
       statusline.setup { use_icons = true }
       require("mini.pairs").setup()
-      require("mini.surround").setup()
+      -- require("mini.surround").setup()
 
       local cursorword = require 'mini.cursorword'
       cursorword.setup { delay = 0 }

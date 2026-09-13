@@ -15,7 +15,7 @@ let
   wallpaper = ./linux.png;
 
   # Full paths to binaries (named *Bin so they don't shadow pkgs.* inside `with pkgs`)
-  xrandrBin        = "${pkgs.xorg.xrandr}/bin/xrandr";
+  xrandrBin 	   = "${pkgs.xrandr}/bin/xrandr";
   wpctlBin         = "${pkgs.wireplumber}/bin/wpctl";
   brightnessctlBin = "${pkgs.brightnessctl}/bin/brightnessctl";
 
@@ -38,21 +38,46 @@ in {
   # Packages
   # ---------------------------------------------------------------------------
   home.packages = with pkgs; [
+    # Desktop
     feh
     brightnessctl
     pavucontrol
     xclip
     gimp
     nerd-fonts.jetbrains-mono
+
+    # Neovim + LSP servers enabled in lsp.lua
+    neovim
+    basedpyright
+    gopls
+    clang-tools            # clangd
+    lua-language-server
+    ruff
+    nil                    # nix
+
+    # Plugin build/runtime deps
+    gcc gnumake            # telescope-fzf-native `build = 'make'`
+    ripgrep fd             # multigrep.lua shells out to rg
   ];
 
   programs.firefox.enable = true;
 
+  programs.bash = {
+    enable = true;
+    historyControl = [ "ignoredups" "ignorespace" ];
+    historySize = 10000;
+  };
+
   programs.git = {
     enable = true;
-    userName = "viodid";
-    userEmail = "you@example.com";   # <- change me
-    extraConfig.init.defaultBranch = "main";
+    settings = {
+      user = {
+        name = "viodid";
+        email = "david.yunta.aller@gmail.com";
+      };
+      init.defaultBranch = "main";
+      pull.rebase = false;
+    };
   };
 
   programs.rofi = {
@@ -69,6 +94,29 @@ in {
     lockCmd = "${pkgs.i3lock}/bin/i3lock -c ${colors.base}";
     inactiveInterval = 10;
   };
+
+  # ---------------------------------------------------------------------------
+  # Neovim
+  # ---------------------------------------------------------------------------
+  home.file.".local/share/nvim/site/pack/nix/start/nvim-treesitter".source =
+    pkgs.vimPlugins.nvim-treesitter.withPlugins (p: with p; [
+      python go c cpp lua bash json yaml toml
+      markdown markdown_inline dockerfile nix rust
+      javascript typescript tsx html css sql
+    ]);
+
+  home.sessionVariables = {
+    EDITOR = "nvim";
+    VISUAL = "nvim";
+  };
+
+  home.shellAliases = {
+    vi = "nvim";
+    vim = "nvim";
+  };
+
+  xdg.configFile."nvim".source =
+    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.dotfiles/nvim";
 
   # ---------------------------------------------------------------------------
   # Alacritty
@@ -192,7 +240,7 @@ in {
       menu = "${pkgs.rofi}/bin/rofi -show drun -show-icons";
 
       focus = {
-        followMouse = false;
+        followMouse = true;
         wrapping = "force";
       };
 

@@ -131,16 +131,6 @@
   };
 
   # ---------------------------------------------------------------------------
-  # System programs
-  # ---------------------------------------------------------------------------
-  programs.neovim = {
-    enable = true;
-    defaultEditor = true;
-    viAlias = true;
-    vimAlias = true;
-  };
-
-  # ---------------------------------------------------------------------------
   # Docker
   # ---------------------------------------------------------------------------
   virtualisation.docker = {
@@ -178,12 +168,11 @@
     unzip
     curl
     wget
-    ripgrep
     fd
-    tree-sitter
-    nodejs
-    python3
   ];
+
+  environment.variables.EDITOR = "nvim";
+  environment.variables.VISUAL = "nvim";
 
   # ---------------------------------------------------------------------------
   # Home Manager
