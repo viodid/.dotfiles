@@ -1,4 +1,8 @@
-{ config, pkgs, lib, ... }:
+{
+  pkgs,
+  lib,
+  ...
+}:
 
 {
   imports = [ ./hardware-configuration.nix ];
@@ -7,7 +11,10 @@
   # Nix
   # ---------------------------------------------------------------------------
   nix.settings = {
-    experimental-features = [ "nix-command" "flakes" ];
+    experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
     auto-optimise-store = true;
   };
   nix.gc = {
@@ -72,8 +79,15 @@
   time.timeZone = "Europe/Madrid";
   i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = lib.genAttrs [
-    "LC_ADDRESS" "LC_IDENTIFICATION" "LC_MEASUREMENT" "LC_MONETARY"
-    "LC_NAME" "LC_NUMERIC" "LC_PAPER" "LC_TELEPHONE" "LC_TIME"
+    "LC_ADDRESS"
+    "LC_IDENTIFICATION"
+    "LC_MEASUREMENT"
+    "LC_MONETARY"
+    "LC_NAME"
+    "LC_NUMERIC"
+    "LC_PAPER"
+    "LC_TELEPHONE"
+    "LC_TIME"
   ] (_: "es_ES.UTF-8");
 
   # ---------------------------------------------------------------------------
@@ -127,7 +141,12 @@
   users.users.viodid = {
     isNormalUser = true;
     description = "viodid";
-    extraGroups = [ "networkmanager" "wheel" "video" "docker" ];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "video"
+      "docker"
+    ];
   };
 
   # ---------------------------------------------------------------------------
@@ -135,7 +154,7 @@
   # ---------------------------------------------------------------------------
   virtualisation.docker = {
     enable = true;
-    enableOnBoot = false;   # socket-activated: starts on first `docker` call
+    enableOnBoot = false; # socket-activated: starts on first `docker` call
     # Alternative that avoids the root-equivalent "docker" group:
     # rootless = { enable = true; setSocketVariable = true; };
   };
@@ -153,9 +172,10 @@
         updateResolvConf = true;
         inherit autoStart;
       };
-    in {
-      nordvpn     = nord "/etc/openvpn/nordvpn-udp.ovpn" true;   # default (UDP, fast)
-      nordvpn-tcp = nord "/etc/openvpn/nordvpn-tcp.ovpn" false;  # fallback for restricted networks
+    in
+    {
+      nordvpn = nord "/etc/openvpn/nordvpn-udp.ovpn" true; # default (UDP, fast)
+      nordvpn-tcp = nord "/etc/openvpn/nordvpn-tcp.ovpn" false; # fallback for restricted networks
     };
 
   # ---------------------------------------------------------------------------
@@ -163,13 +183,16 @@
   # ---------------------------------------------------------------------------
   environment.systemPackages = with pkgs; [
     git
-    gcc
-    gnumake
     unzip
     curl
     wget
-    fd
+    htop-vim
   ];
+
+  documentation = {
+    dev.enable = true;
+    man.cache.enable = true;
+  };
 
   environment.variables.EDITOR = "nvim";
   environment.variables.VISUAL = "nvim";

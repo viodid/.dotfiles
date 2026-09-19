@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 let
   mod = "Mod1";
@@ -15,8 +20,8 @@ let
   wallpaper = ./linux.png;
 
   # Full paths to binaries (named *Bin so they don't shadow pkgs.* inside `with pkgs`)
-  xrandrBin 	   = "${pkgs.xrandr}/bin/xrandr";
-  wpctlBin         = "${pkgs.wireplumber}/bin/wpctl";
+  xrandrBin = "${pkgs.xrandr}/bin/xrandr";
+  wpctlBin = "${pkgs.wireplumber}/bin/wpctl";
   brightnessctlBin = "${pkgs.brightnessctl}/bin/brightnessctl";
 
   # Pick a power profile from a rofi menu
@@ -26,7 +31,8 @@ let
       | ${pkgs.rofi}/bin/rofi -dmenu -p "power ($current)") || exit 0
     ${pkgs.power-profiles-daemon}/bin/powerprofilesctl set "$choice"
   '';
-in {
+in
+{
   home.username = "viodid";
   home.homeDirectory = "/home/viodid";
   home.stateVersion = "26.05";
@@ -50,21 +56,29 @@ in {
     neovim
     basedpyright
     gopls
-    clang-tools            # clangd
+    clang-tools # clangd
     lua-language-server
     ruff
-    nil                    # nix
+    nil # nix
 
-    # Plugin build/runtime deps
-    gcc gnumake            # telescope-fzf-native `build = 'make'`
-    ripgrep fd             # multigrep.lua shells out to rg
+    # Dev tools
+    gcc
+    nasm
+    man-pages-posix
+    man-pages
+    gnumake # telescope-fzf-native `build = 'make'`
+    ripgrep
+    fd # multigrep.lua shells out to rg
   ];
 
   programs.firefox.enable = true;
 
   programs.bash = {
     enable = true;
-    historyControl = [ "ignoredups" "ignorespace" ];
+    historyControl = [
+      "ignoredups"
+      "ignorespace"
+    ];
     historySize = 10000;
   };
 
@@ -99,11 +113,31 @@ in {
   # Neovim
   # ---------------------------------------------------------------------------
   home.file.".local/share/nvim/site/pack/nix/start/nvim-treesitter".source =
-    pkgs.vimPlugins.nvim-treesitter.withPlugins (p: with p; [
-      python go c cpp lua bash json yaml toml
-      markdown markdown_inline dockerfile nix rust
-      javascript typescript tsx html css sql
-    ]);
+    pkgs.vimPlugins.nvim-treesitter.withPlugins
+      (
+        p: with p; [
+          python
+          go
+          c
+          cpp
+          lua
+          bash
+          json
+          yaml
+          toml
+          markdown
+          markdown_inline
+          dockerfile
+          nix
+          rust
+          javascript
+          typescript
+          tsx
+          html
+          css
+          sql
+        ]
+      );
 
   home.sessionVariables = {
     EDITOR = "nvim";
@@ -125,12 +159,25 @@ in {
     enable = true;
     settings = {
       window = {
-        padding = { x = 10; y = 10; };
+        padding = {
+          x = 10;
+          y = 10;
+        };
         opacity = 0.95;
       };
       font = {
-        normal = { family = "JetBrainsMono Nerd Font"; style = "Regular"; };
-        size = 11.0;
+        normal = {
+          family = "JetBrainsMono Nerd Font";
+          style = "Regular";
+        };
+        size = 15.0;
+      };
+      mouse = {
+        hide_when_typing = true;
+      };
+      scrolling = {
+        history = 10000;
+        multiplier = 3;
       };
       colors.primary = {
         background = "0x${colors.base}";
@@ -250,8 +297,16 @@ in {
       };
 
       workspaceOutputAssign =
-        map (n: { workspace = toString n; output = externalMonitor; }) (lib.range 1 9)
-        ++ [ { workspace = "10"; output = laptopScreen; } ];
+        map (n: {
+          workspace = toString n;
+          output = externalMonitor;
+        }) (lib.range 1 9)
+        ++ [
+          {
+            workspace = "10";
+            output = laptopScreen;
+          }
+        ];
 
       keybindings = lib.mkOptionDefault {
         "${mod}+Shift+x" = "exec ${config.services.screen-locker.lockCmd}";
@@ -260,12 +315,13 @@ in {
         "${mod}+p" = "exec --no-startup-id ${powerProfileMenu}";
 
         # Audio (PipeWire/WirePlumber, capped at 100%)
-        "XF86AudioRaiseVolume" = "exec --no-startup-id ${wpctlBin} set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+";
+        "XF86AudioRaiseVolume" =
+          "exec --no-startup-id ${wpctlBin} set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+";
         "XF86AudioLowerVolume" = "exec --no-startup-id ${wpctlBin} set-volume @DEFAULT_AUDIO_SINK@ 5%-";
-        "XF86AudioMute"        = "exec --no-startup-id ${wpctlBin} set-mute @DEFAULT_AUDIO_SINK@ toggle";
+        "XF86AudioMute" = "exec --no-startup-id ${wpctlBin} set-mute @DEFAULT_AUDIO_SINK@ toggle";
 
         # Brightness
-        "XF86MonBrightnessUp"   = "exec --no-startup-id ${brightnessctlBin} set +10%";
+        "XF86MonBrightnessUp" = "exec --no-startup-id ${brightnessctlBin} set +10%";
         "XF86MonBrightnessDown" = "exec --no-startup-id ${brightnessctlBin} set 10%-";
 
         # Navigation (Vim keys)
