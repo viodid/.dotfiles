@@ -96,8 +96,8 @@
   services.xserver = {
     enable = true;
     xkb = {
-      layout = "us";
-      options = "caps:escape";
+      layout = "us,es";
+      options = "caps:escape,grp:win_space_toggle";
     };
     displayManager.lightdm = {
       enable = true;
@@ -183,6 +183,8 @@
   # ---------------------------------------------------------------------------
   environment.systemPackages = with pkgs; [
     git
+    gcc
+    gnumake
     unzip
     curl
     wget

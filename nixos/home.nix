@@ -62,13 +62,14 @@ in
     nil # nix
 
     # Dev tools
-    gcc
     nasm
     man-pages-posix
     man-pages
     gnumake # telescope-fzf-native `build = 'make'`
     ripgrep
     fd # multigrep.lua shells out to rg
+    python314
+    uv
   ];
 
   programs.firefox.enable = true;
@@ -264,7 +265,7 @@ in
         { block = "sound"; }
         {
           block = "battery";
-          interval = 10;
+          interval = 60;
           format = " $icon $percentage ";
         }
         {
