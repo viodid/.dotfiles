@@ -1,6 +1,6 @@
 vim.opt.nu = true
 vim.opt.relativenumber = true
-vim.opt.signcolumn = "yes"      -- stops gitsigns/diagnostics shifting text
+vim.opt.signcolumn = "yes" -- stops gitsigns/diagnostics shifting text
 
 vim.opt.tabstop = 4
 vim.opt.expandtab = true
@@ -11,7 +11,7 @@ vim.opt.smartindent = true
 
 vim.opt.swapfile = false
 vim.opt.backup = false
-vim.opt.undodir = vim.fn.stdpath("state") .. "/undo"  -- created automatically
+vim.opt.undodir = vim.fn.stdpath("state") .. "/undo" -- created automatically
 vim.opt.undofile = true
 
 vim.opt.hlsearch = true
@@ -36,7 +36,7 @@ vim.api.nvim_create_autocmd("TextYankPost", {
   desc = "Highlight when yanking",
   group = vim.api.nvim_create_augroup("highlight-yank", { clear = true }),
   callback = function()
-    vim.hl.on_yank()            -- vim.highlight.on_yank is deprecated
+    vim.hl.on_yank() -- vim.highlight.on_yank is deprecated
   end,
 })
 

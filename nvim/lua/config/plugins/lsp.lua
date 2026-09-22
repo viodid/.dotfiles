@@ -3,9 +3,13 @@ return {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
-      { "folke/lazydev.nvim", ft = "lua", opts = {
+      {
+        "folke/lazydev.nvim",
+        ft = "lua",
+        opts = {
           library = { { path = "${3rd}/luv/library", words = { "vim%.uv" } } },
-      } },
+        }
+      },
     },
     config = function()
       -- one wildcard config instead of repeating capabilities per server
@@ -20,7 +24,9 @@ return {
         end,
       })
 
-      vim.lsp.enable({ "basedpyright", "gopls", "clangd", "lua_ls", "ruff", "nil_ls" })
+      vim.lsp.config("asm_lsp", { filetypes = { "asm", "vmasm", "nasm", "s", "S" }, })
+
+      vim.lsp.enable({ "basedpyright", "gopls", "clangd", "lua_ls", "ruff", "nil_ls", "asm_lsp" })
 
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("my.lsp.attach", { clear = true }),

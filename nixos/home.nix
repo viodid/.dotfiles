@@ -60,6 +60,7 @@ in
     lua-language-server
     ruff
     nil # nix
+    asm-lsp
 
     # Dev tools
     nasm
@@ -137,6 +138,10 @@ in
           html
           css
           sql
+          asm
+          nasm
+          objdump
+          llvm
         ]
       );
 
