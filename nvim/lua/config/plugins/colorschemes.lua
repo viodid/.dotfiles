@@ -22,7 +22,7 @@ return {
   {
     "catppuccin/nvim",
     name = "catppuccin",
-    enabled = true,
+    enabled = false,
     lazy = false,
     priority = 1000,
     opts = {
@@ -33,5 +33,15 @@ return {
       require("catppuccin").setup(opts)
       vim.cmd.colorscheme("catppuccin-mocha")
     end,
+  },
+  {
+    "EdenEast/nightfox.nvim",
+    name = "nordfox", -- nightfox, nordfox, terafox, carbonfox
+    enabled = true,
+    lazy = false,
+    priority = 1000,
+    config = function()
+      vim.cmd("colorscheme nordfox")
+    end
   },
 }
