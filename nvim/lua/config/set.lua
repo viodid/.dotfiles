@@ -56,3 +56,6 @@ vim.diagnostic.config({
     },
   },
 })
+
+-- overlay stand out
+vim.opt.winborder = "rounded" -- "single", "double", "solid", "shadow", "bold", "none"
